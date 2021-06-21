@@ -1,0 +1,56 @@
+<form class="profileform" method="post" action="/users/<%= @user.id %>">
+   <input name="_method" type="hidden" value="patch" />
+   <table>
+  <tbody>
+      <tr>
+        <td><strong>user:</strong></td>
+        <td><%= @user.username %></td>
+      </tr>
+      
+      <tr>
+        <td><strong>created:</strong></td>
+        <td><%= @user.created_at %></td>
+      </tr>
+      
+      <tr>
+        <td><strong>karma:</strong></td>
+        <td><%= @user.karma %></td>
+      </tr>
+      <tr>
+        <td><strong>api key:</strong></td>
+        <td><%=@user.api_key%></td>
+        
+        
+        
+      </tr>
+      <tr>
+        <td><strong>about:</strong></td>
+        <td>
+              <textarea cols="60" rows="5" wrap="virtual" name="about"><%= @user.about %></textarea>
+              <font size="-2"><a href="/formatdoc"><font color="#afafaf">help</font></a>
+              </font>
+        </td>
+        
+      </tr>
+      <tr>
+        <td></td>
+        <td><%= link_to 'favorites', users_path %></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><%= link_to 'comments', users_path %></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><%= link_to 'submissions', edit_user_path(@user) %><td>
+      </tr>
+      <tr>
+        <td> <div class="actions">
+          <input type="submit" value="update" />
+      </div></td>
+      </tr>
+     
+    
+  </tbody>
+  </table>
+  </form>

@@ -1,0 +1,68 @@
+<div id="background">
+<div id ="header">
+    <tr><td bgcolor="#ff6600"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px"><tr><td style="width:18px;padding-right:4px"><a href="/tweets"><img src="https://news.ycombinator.com/favicon.ico" width="18" height="18" style="border:1px white solid;"></a></td>
+                    <td style="line-height:12pt; height:10px;"><span class="pagetop"><b class="hnname"><a href="/tweets">Hacker News</a></b>
+                <a href="/tweets?orderby=newest">new</a><%if session[:user_id]!= nil %> | threads <%end%>| <a href="/tweets?orderby=past">past</a> | <a href="/comments">comments</a> | <a href="/tweets?orderby=ask">ask</a> | <a href="/tweets?orderby=url">show</a> | jobs <%if session[:user_id] != nil %>|<%= link_to 'Submit', new_tweet_path %><%else %>| <%- resource_class.omniauth_providers.each do |provider| %>
+                                    <%= link_to "Submit", omniauth_authorize_path(resource_name, provider), method: :post %> <%end%>  <% end %>      </span></td>
+                        <td style="text-align:right;padding-right:4px;"><span class="pagetop">
+                                
+                              <% if session[:user_id] == nil %>
+                                <%- if devise_mapping.omniauthable? %>
+                                  <%- resource_class.omniauth_providers.each do |provider| %>
+                                    <%= link_to "Login", omniauth_authorize_path(resource_name, provider), method: :post %><br />
+                                  <% end -%>
+                                <% end -%>
+                              <% else %>
+                                    <% @username = User.find(session[:user_id]).email.split('@')[0].strip %>
+                                   <p><%= @username %>(<%=User.find(session[:user_id]).karma%>) | 
+                                   <a href="/users/<%= session[:user_id] %>?logout=true">logout</a></p>
+                              <%end%>
+                  
+                            </span></td>
+                </tr></table></td>
+                </tr>
+  </div>
+  
+<table>
+
+  <tbody>
+      <tr>
+        <td> 
+              <% if  session[:user_id] == nil %>
+                <%- resource_class.omniauth_providers.each do |provider| %>
+                                    <%= link_to image_tag('https://news.ycombinator.com/grayarrow.gif'), omniauth_authorize_path(resource_name, provider), method: :post %><br />
+                  <% end -%>
+              <% elsif @username != @tweet.author%> 
+                <% if Vote.where(tipus: "contribution", idType: @tweet.id, idUser: User.find(session[:user_id]).id).count == 0%>
+                  <a href='/tweets/<%= @tweet.id %>?vote=true'><img src="https://news.ycombinator.com/grayarrow.gif"></a> 
+                <%end%>
+              <%else%> 
+                <p style="color: orange;">*</p>
+              <%end%>
+            </td>
+        <td><% if @tweet.ask == false %><a href="http://<%= @tweet.url %>" target="_blank"><%= @tweet.title %></a> <%else%><a href="/tweets/<%= @tweet.id%>"><%= @tweet.title %></a> <% end %> <% if @tweet.ask == false %>(<%= @tweet.shorturl %>)<% end %></td>
+      </tr>
+      <tr>
+        <td></td>
+         <% @user = User.find(@tweet.user_id) %>
+        <td class="below-info"><%= @tweet.points %> points by <% if (session[:user_id] != nil && User.find(session[:user_id]).username != @tweet.author)  || session[:user_id] == nil %> <a href="/users/<%= @user.id %>"><%= @tweet.author%></a> <% else %> <a href="/users/<%= @user.id %>/edit"><%= @tweet.author%></a> <%end%><%= time_ago_in_words(@tweet.created_at) %> ago <% if session[:user_id] != nil && Vote.where(tipus: "contribution", idType: @tweet.id, idUser: User.find(session[:user_id]).id).count == 1 %>
+                  | <a href="/tweets/<%= @tweet.id %>?vote=false">unvote</a>
+                  <% end %> | hide | past | <a href="/tweets/<%= @tweet.id%>"><% @num_comments = Comment.where(contribution: @tweet.id).count %> <% if @num_comments == 0 %> discuss <% else %> <%= @num_comments %> comments <% end %> </a>  <% if @username == @tweet.author%> | <%= link_to 'Edit', edit_tweet_path(@tweet) %> | <%= link_to 'Destroy', @tweet, method: :delete, data: { confirm: 'Are you sure?' } %> <%end%></td>
+      </tr>
+  </tbody>
+</table>
+
+<%= render 'form3', tweet: @tweet %>
+
+<tr><td><img src="https://news.ycombinator.com/s.gif" height="10" width="0"><table width="100%" cellspacing="0" cellpadding="1"><tr><td bgcolor="#ff6600"></td></tr></table><br><center><span class="yclinks"><a href="https://news.ycombinator.com/newsguidelines.html">Guidelines</a>
+        | <a href="https://news.ycombinator.com/newsfaq.html">FAQ</a>
+        | <a href="https://news.ycombinator.com/lists">Lists</a>
+        | <a href="https://github.com/HackerNews/API">API</a>
+        | <a href="https://news.ycombinator.com/security.html">Security</a>
+        | <a href="http://www.ycombinator.com/legal/">Legal</a>
+        | <a href="http://www.ycombinator.com/apply/">Apply to YC</a>
+        | <a href="mailto:hn@ycombinator.com">Contact</a></span><br><br><form method="get" action="//hn.algolia.com/">Search:
+          <input type="text" name="q" value="" size="17" autocorrect="off" spellcheck="false" autocapitalize="off" autocomplete="false"></form>
+            </center></td></tr>
+      </table></center></body>
+</div>

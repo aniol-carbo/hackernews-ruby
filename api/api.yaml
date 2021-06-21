@@ -1,0 +1,700 @@
+openapi: 3.0.0
+info:
+  title: HackerNews API
+  version: "1.0.0"
+servers:
+  - url: 'https://asw-hackernwes-g11.herokuapp.com'
+    description: Heroku server
+tags:
+  - name: Publicacions
+    description: Operacions amb les publicacions
+  - name: Usuaris
+    description: Operacions de l'usuari
+  - name: Comentaris
+    description: Operacions amb els comentaris
+paths:
+  /tweets:
+    get:
+      summary: Llista tots les publicacions
+      tags: 
+        - Publicacions
+      parameters:
+      - name: orderby
+        required: false
+        in: query
+        description: Ordre en què es volen llistar les publicacions
+        schema:
+          type: string
+      - name: user_id
+        required: false
+        in: query
+        description: Id de l'usuari
+        schema:
+          type: integer
+          minimum: 1  
+      - name: voted
+        required: false
+        in: query
+        description: Indica si es volen les contribucions que l'usuari ha votat
+        schema:
+          type: boolean
+      responses:
+        200:
+          description: Retorna totes les publicacions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    author:
+                      type: string
+                      example: user1
+                    content:
+                      type: string
+                      example: ""
+                    created_at:
+                      type: string
+                      example: "2021-05-08T00:52:46.169Z"
+                    url:
+                      type: string
+                      example: www.fib.upc.edu
+                    title:
+                      type: string
+                      example: La FIB
+                  required:
+                    - id
+                    - author
+                    - content
+                    - created_at
+                    - url
+                    - title
+      security:
+        - ApiKeyAuth: []
+        
+    post:
+      summary: Creació d'una publicació
+      tags: 
+        - Publicacions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: La FIB
+                url:
+                  type: string
+                  example: www.fib.upc.edu
+                content:
+                  type: string
+                  example: Aquesta és la meva facultat
+              required:
+                - title
+      responses:
+        201:
+          description: Publicació creada correctament
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        401:
+          description: La crida no conté una api_key vàlida
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Unauthorized, you don't have a valid api_key
+        400:
+          description: "Error - Aquesta URL ja existeix, el titol està buit o s'ha omplert el content i la url a la vegada"
+          content:
+            application/json:
+              schema:
+                type: string
+                example: The URL already exists
+      security:
+        - ApiKeyAuth: []
+      
+  /tweets/{id}:
+    get:
+      summary: Permet veure, votar o desvotar una publicació
+      tags: 
+        - Publicacions
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: Id de la publicació
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+        - name: vote
+          in: query
+          description: La intenció de votar o desvotar una publicació
+          schema:
+            type: boolean
+      responses:
+        200: 
+          description: "No hi ha hagut cap error, es mostra la contribució o bé s'indica que s'ha votat o desvotat correctament"
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Tweet'
+        400:
+          description: Error - Ja has votat/desvotat aquesta contribució
+          content:
+            application/json:
+              schema:
+                type: string
+                example: You have alredy voted this contribution
+        403: 
+          description: Error - No pots votar una contribució que és teva
+          content:
+            application/json:
+              schema:
+                type: string
+                example: You can't vote your contribution
+        404:
+          description: 'La contribució no existeix'
+      security:
+        - ApiKeyAuth: []
+    delete:
+      summary: Elimina una publicació
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Id de la publicació
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+      security:
+        - ApiKeyAuth: []
+      tags:
+        - Publicacions
+      responses:
+        200:
+          description: Publicació eliminada correctament
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Contribution successfully deleted
+        401:
+          description: La crida no conté una api_key vàlida
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Unauthorized, you don't have a valid api_key
+        403:
+          description: "L'usuari no té permisos per eliminar la publicació"
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "The user does not have permissions to delete this contribution"
+        404:
+          description: 'La publicació no existeix'
+    put:
+      summary: Editar una publicació
+      tags: 
+        - Publicacions
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Id de la publicació
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: La FIB
+                url:
+                  type: string
+                  example: www.fib.upc.edu
+                content:
+                  type: string
+                  example: Aquesta és la meva facultat
+              required:
+                - title
+      responses:
+        200:
+          description: Publicació editada correctament
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        401:
+          description: La crida no conté una api_key vàlida
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Unauthorized, you don't have a valid api_key
+        400:
+          description: "Error - El títol està en blanc o s'ha omplert el camp de text quan la publicació no té el camp URL buit"
+          content:
+            application/json:
+              schema:
+                type: string
+                example: The title is blank
+        403:
+          description: 'Error - No pots editar una publicació que no és teva'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: You can't edit a contribution that is not yours
+        404:
+          description: 'La publicació no existeix'
+      security:
+      - ApiKeyAuth: []
+  
+  /users/{id}:
+    get:
+      summary: Informació de l'usuari
+      tags:
+        - Usuaris
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id de l'usuari
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Retorna totes les propietats de l'usuari
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: "L'usuari no existeix"
+      security:
+        - ApiKeyAuth: []
+        
+    put:
+      description: Actualitza el perfil de l'usuari
+      tags:
+        - Usuaris
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: La id de l'usuari
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                about:
+                  type: string
+                  example: Sóc un estudiant de la FIB
+      responses:
+        200:
+          description: Perfil actualitzat correctament
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Ok
+        401:
+          description: La crida no conté una api_key vàlida
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Unauthorized, you don't have a valid api_key
+        403:
+          description: "L'usuari no té permisos per modificar aquest perfil"
+          content:
+            application/json:
+              schema:
+                type: string
+                example: L'usuari no té permisos per modificar aquest perfil
+        404:
+          description: "L'usuari no existeix"
+      security:
+        - ApiKeyAuth: []
+        
+  /comments:
+    get:
+      summary: Llista tots els comentaris amb les caracteristiques demanades
+      tags: 
+        - Comentaris
+      parameters:
+        - name: user_id
+          in: query
+          description: Id de l'usuari
+          schema:
+            type: integer
+            minimum: 1  
+        - name: voted
+          in: query
+          description: Indica si es volen els comentaris que l'usuari ha votat
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: Retorna tots els comentaris
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        403:
+          description: Error - L'usuari no pot veure els comentaris votats d'altres usuaris
+      security:
+        - ApiKeyAuth: []
+    post:
+      summary: Realitzar un comentari
+      tags:
+        - Comentaris
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: Molt interessant!
+                contribution:
+                  type: integer
+                  example: 1
+                  minimum: 1
+                escomment:
+                  type: boolean
+                  example: false
+                comment_id:
+                  type: integer
+                  example: 1
+              required:
+                - contribution
+                - text
+      responses:
+        201:
+          description: El comentari s'ha creat correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        400:
+          description: El camp text no pot ser blanc
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Text property cannot be blank
+        403:
+          description: L'usuari esta comentant a la seva propia contribució
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Un usuari no pot fer comentaris de la seva propia contribució
+        422:
+          description: No es pot crear un comentari amb aquest contingut
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Unprocessable entity
+      security:
+        - ApiKeyAuth: []
+  /comments/{id}:
+    get:
+      summary: Mostra el comentari o reply i permet votarlo/desvotarlo o mostrar les seves replies
+      tags:
+        - Comentaris
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del comentari
+          schema:
+            type: integer
+            minimum: 1  
+        - name: vote
+          in: query
+          description: Vota o desvota el comentari
+          schema:
+            type: boolean
+        - name: replies
+          in: query
+          description: Obtenir replies del comentari
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: "No hi ha hagut cap error, es mostra el comentari o les replies o bé s'indica que s'ha votat o desvotat correctament"
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Comment'
+        400:
+          description: 'Ja has votat aquest comentari o estas intentant desvotar un comentari que no has votat'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'You cannot vote the same comment twice'
+        403:
+          description: "No pots votar el teu propi comentari o l'usuari no és vàlid"
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'You cannot vote your own comment'
+        404:
+          description: 'El comentari no existeix'
+      security:
+        - ApiKeyAuth: []
+    put:
+      summary: Edita el comentari o reply
+      tags:
+        - Comentaris
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del comentari
+          schema:
+            type: integer
+            minimum: 1 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: M'havia equivocat
+              required:
+                - text
+      responses:
+        200:
+          description: El comentari s'ha editat correctament
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        400:
+          description: El camp text no pot estar buit
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Text cannot be empty
+        401:
+          description: La crida no conté una api_key vàlida
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Unauthorized, you don't have a valid api_key
+        403:
+          description: No pots editar un comentari que no es teu
+          content:
+            application/json:
+              schema:
+                type: string
+                example: You can't edit a comment that is not yours
+        404:
+          description: El comentari no existeix
+      security:
+        - ApiKeyAuth: []
+    delete:
+      summary: Elimina el commentari o reply
+      tags:
+        - Comentaris
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del comentari
+          schema:
+            type: integer
+            minimum: 1 
+      responses:
+        200:
+          description: Comentari eliminat correctament
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Comment successfully deleted
+        401:
+          description: La crida no conté una api_key vàlida
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Unauthorized, you don't have a valid api_key
+        403:
+          description: L'usuari no te permisos per eliminar el comentari
+          content:
+            application/json:
+              schema:
+                type: string
+                example: The user does not have permissions to delete this comment
+        404:
+          description: El comentari no existeix
+      security:
+        - ApiKeyAuth: []
+
+components:
+  schemas:
+    Tweet:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        author:
+          type: string
+          example: user1
+        content:
+          type: string
+          example: ""
+        created_at:
+          type: string
+          example: "2021-05-08T00:52:46.169Z"
+        url:
+          type: string
+          example: www.fib.upc.edu
+        title:
+          type: string
+          example: La FIB
+      required:
+        - id
+        - author
+        - content
+        - created_at
+        - url
+        - title
+    Comment:
+      type: object
+      properties:
+        comment_id:
+          type: integer
+          minimum: 1
+          example: 1
+        text:
+          type: string
+          example: Hola
+        user:
+          type: integer
+          minimum: 1
+          example: 1
+          description: Id de l'usuari que ha fet el comentari
+        contribution:
+          type: integer
+          minimum: 1
+          example: 1
+          description: id de la contribucio a la que fa referencia
+        created_at:
+          type: string
+          example: "2021-05-05T17:18:47.855Z"
+        points:
+          type: integer
+          minimum: 1
+          example: 1
+        escomment:
+          type: boolean
+        updated_at:
+          type: string
+          example: "2021-05-05T17:18:47.855Z"
+      required:
+        - comment_id
+        - text
+        - user
+        - contribution
+        - created_at
+        - points
+        - escomment
+        - updated_at
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: nom.cognom
+        password:
+          type: string
+          example: null
+        created_at:
+          type: string
+          example: "2021-05-05T17:18:47.855Z"
+        updated_at:
+          type: string
+          example: "2021-05-05T17:18:47.855Z"
+        provider:
+          type: string
+          example: google_oauth2
+        uid:
+          type: string
+          example: 105040797769568356730
+        email:
+          type: string
+          example: joan@fib.upc.edu
+        google_token:
+          type: string
+          example: null
+        google_refresh_token:
+          type: string
+          example: null
+        confirmation_token:
+          type: string
+          example: null
+        karma:
+          type: integer
+          example: 2
+        about:
+          type: string
+          example: "Hola"
+      required:
+        - username
+        - karma
+        - about
+        - created_at
+        - updated_at
+        - email
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: X-API-KEY
+      in: header

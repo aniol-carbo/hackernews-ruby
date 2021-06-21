@@ -1,4 +1,4 @@
-## Lliurament 3 ASW:
+## Lliurament 2 ASW:
 
 Students:
 
@@ -8,8 +8,6 @@ Students:
 * Viladrosa, Oriol
 
 
-Our webapp @ Firebase: https://hackernews-309509.web.app/home
+Our webapp @ Heroku: https://asw-hackernwes-g11.herokuapp.com/
 
 Trello: https://trello.com/b/6jLjykpI/hackernews-g11
-
-Repositori API (Back-end): https://bitbucket.org/rogerhoms/hackernews/src/master/

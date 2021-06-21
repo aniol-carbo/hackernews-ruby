@@ -1,0 +1,35 @@
+<form class="profileform" method="post" action="/tweets/<%= @tweet.id %>">
+   <input name="_method" type="hidden" value="patch" />
+   <table>
+  <tbody>
+        <tr>
+            <td><strong>Title:</strong></td>
+            <td>
+                  <textarea cols="20" rows="2" wrap="virtual" name="title"><%= @tweet.title %></textarea>
+            </td>
+        </tr>
+        <tr>
+        <% if @tweet.ask == true %> 
+            <td><strong>Content:</strong></td>
+            <td>
+                  <textarea cols="60" rows="5" wrap="virtual" name="content"><%= @tweet.content %></textarea>
+            </td>
+        <% else %> 
+            <td><strong>Url:</strong></td>
+            <td>
+                  <p cols="60" rows="5" wrap="virtual" name="url"><%= @tweet.url %></p>
+            </td>
+        <% end %>
+        </tr>
+        <tr>
+            <td> 
+                <div class="actions">
+                    <input type="submit" value="update" />
+                </div>
+            </td>
+        </tr>
+     
+    
+  </tbody>
+  </table>
+  </form>

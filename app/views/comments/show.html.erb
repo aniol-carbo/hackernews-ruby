@@ -1,0 +1,39 @@
+<%= stylesheet_link_tag "application" %>
+<link rel="shortcut icon" href="favicon.ico">
+
+
+
+<div id="background">
+<div id ="header">
+  <tr><td bgcolor="#ff6600"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px"><tr><td style="width:18px;padding-right:4px"><a href="/tweets"><img src="https://news.ycombinator.com/favicon.ico" width="18" height="18" style="border:1px white solid;"></a></td>
+                  <td style="line-height:12pt; height:10px;"><span class="pagetop"><b class="hnname">Add comment</a></b></td>
+              </tr></table></td>
+              </tr>
+</div>
+<table>
+
+  <tbody>
+      <tr>
+        <td> <a href='/comments/<%= @comment.id %>?vote=true'><img src="https://news.ycombinator.com/grayarrow.gif"></a></td>
+        <% @author=User.find(@comment.user) %>
+        <% @tweet=Tweet.find(@comment.contribution) %>
+        <td class="below-info"> <%if (session[:user_id] != nil && User.find(session[:user_id]).username != @author.username)  || session[:user_id] == nil %> <a href="/users/<%= @author.id %>"><%=@author.username%></a> <% else %> <a href="/users/<%= @author.id %>/edit"><%=@author.username%></a> <%end%> <%= time_ago_in_words(@comment.created_at) %> ago | On: <%= @tweet.title %></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="first-row"><%= @comment.text %></td>
+      </tr>
+      <tr></tr>
+      <tr>
+        <td></td>
+        <%# @comment_contestar=Comment.where(:coment_id => @comment.id) %>
+      <td> <%= render 'comments/form2', tweet: @tweet , comment: @comment  %></td>
+      
+      
+  </tbody>
+</table>
+
+<br>
+</div>
+
+

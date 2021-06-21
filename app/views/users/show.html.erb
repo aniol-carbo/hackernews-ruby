@@ -1,0 +1,76 @@
+<%= csrf_meta_tags %>
+<%= stylesheet_link_tag "application" %>
+<link rel="shortcut icon" href="favicon.ico">
+
+
+<div id="background">
+<div id ="header">
+  <tr><td bgcolor="#ff6600"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px"><tr><td style="width:18px;padding-right:4px"><a href="/tweets"><img src="https://news.ycombinator.com/favicon.ico" width="18" height="18" style="border:1px white solid;"></a></td>
+                  <td style="line-height:12pt; height:10px;"><span class="pagetop"><b class="hnname"><a href="/tweets">Hacker News</a></b>
+              <a href="/tweets?orderby=newest">new</a><%if session[:user_id]!= nil %> | threads <%end%>| <a href="/tweets?orderby=past">past</a>| <a href="/comments">comments</a> | <a href="/tweets?orderby=ask">ask</a> | <a href="/tweets?orderby=url">show</a> | jobs <%if session[:user_id] != nil %>|<%= link_to 'Submit', new_tweet_path %><%else %>| <%- resource_class.omniauth_providers.each do |provider| %>
+                                  <%= link_to "Submit", omniauth_authorize_path(resource_name, provider), method: :post %> <%end%>  <% end %>      </span></td>
+                      <td style="text-align:right;padding-right:4px;"><span class="pagetop">
+                              
+                            <% if session[:user_id] == nil %>
+                              <%- if devise_mapping.omniauthable? %>
+                                <%- resource_class.omniauth_providers.each do |provider| %>
+                                  <%= link_to "Login", omniauth_authorize_path(resource_name, provider), method: :post %><br />
+                                <% end -%>
+                              <% end -%>
+                            <% else %>
+                                  <% @username = User.find(session[:user_id]).email.split('@')[0].strip %>
+                                 <p><a href="/users/<%= session[:user_id] %>/edit"><%= @username %>(<%=User.find(session[:user_id]).karma%>)</a> | 
+                                 <a href="/users/<%= session[:user_id] %>?logout=true">logout</a></p>
+                            <%end%>
+                
+                          </span></td>
+              </tr></table></td>
+              </tr>
+</div>
+<table>
+
+  <tbody>
+      <tr>
+        <td><strong>user:</strong></td>
+        <td><%= @user.username %></td>
+      </tr>
+      
+      <tr>
+        <td><strong>created:</strong></td>
+        <td><%= @user.created_at %></td>
+      </tr>
+      
+      <tr>
+        <td><strong>karma:</strong></td>
+        <td><%= @user.karma %></td>
+      </tr>
+      <tr>
+        <td><strong>about:</strong></td>
+        <td><%=@user.about%></td>
+        
+        
+        
+      </tr>
+      <tr>
+        <td></td>
+        <td>favorites</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>coments</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>submissions<td>
+      </tr>
+      
+      
+    
+  </tbody>
+</table>
+
+<br>
+
+</div>
+
+

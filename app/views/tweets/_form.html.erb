@@ -1,0 +1,47 @@
+<%= stylesheet_link_tag "application" %>
+<div id="background">
+<div id ="header">
+  <tr><td bgcolor="#ff6600"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px"><tr><td style="width:18px;padding-right:4px"><a href="/tweets"><img src="https://news.ycombinator.com/favicon.ico" width="18" height="18" style="border:1px white solid;"></a></td>
+                  <td style="line-height:12pt; height:10px;"><span class="pagetop"><b class="hnname"><a>Submit</a></b>
+                  </span></td>
+              </tr></table></td>
+              </tr></div>
+<%= form_with(model: tweet) do |form| %>
+  <% if tweet.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(tweet.errors.count, "error") %> prohibited this tweet from being saved:</h2>
+
+      <ul>
+        <% tweet.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title %>
+  </div>
+  
+  <div class="field">
+    <%= form.label :url %>
+    <%= form.text_area :url %>
+  </div>
+  
+  <div class="field">
+    <%= form.label :content %>
+    <%= form.text_area :content %>
+    <%= form.hidden_field :author, :value=> session[:user_id]%> 
+  </div>
+
+  <div class="actions">
+    <%= form.submit :Submit %>
+  </div>
+  
+  <p>Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the thread.</p>
+  <p>You can also submit via bookmarklet.</p>
+<% end %>
+</div>
+
+

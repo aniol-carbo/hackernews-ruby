@@ -1,0 +1,20 @@
+<%= stylesheet_link_tag "application" %>
+
+
+<%= form_with(model: comment) do |form| %>
+
+  <% #form to create comments of a post%>
+  <div class="field">
+    <%= form.label :text %>
+    <%= form.text_area :text %>
+    <%= form.hidden_field :contribution, :value=> tweet.id%>
+    <%= form.hidden_field :escomment, :value=> true %>
+    <%= form.hidden_field :comment_id, :value=> nil %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit :Submit %>
+  </div>
+  
+  
+<% end %>
